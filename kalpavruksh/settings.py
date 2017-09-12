@@ -57,7 +57,22 @@ REST_FRAMEWORK = {
     )
 }
 
+REST_FRAMEWORK = {
+'DEFAULT_THROTTLE_CLASSES': (
+        'quiz.authentication.RandomRateThrottle',
+    ),
+    #'DEFAULT_THROTTLE_RATES': {
+    #    'anon': '100/day',
+    #    'user': '1000/day'
+    #}
+}
 ROOT_URLCONF = 'kalpavruksh.urls'
+
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
 
 TEMPLATES = [
     {

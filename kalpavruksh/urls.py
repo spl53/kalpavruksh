@@ -21,7 +21,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^users/', views.UserList.as_view()),
-    url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
+    url(r'^get_question/', views.QuesList.as_view()),
+    url(r'^$', views.Dashboard.as_view()),
 ]
 

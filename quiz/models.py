@@ -32,7 +32,18 @@ class Answer(models.Model):
 class Tenant(models.Model):
 	name = models.TextField()
 	api_key = models.TextField()
+	api_request_count = models.IntegerField()
 	
 	class Meta:
 		"""This is the table name in Database."""
 		db_table = 'Tenant'
+	
+class ApiRequestCount(models.Model):
+	date = models.DateField(primary_key=True)
+	tenant = models.ForeignKey(Tenant)
+	api_request_count = models.IntegerField()
+	last_requested_on = models.DateTimeField()
+	
+	class Meta:
+		"""This is the table name in Database."""
+		db_table = 'ApiRequestCount'

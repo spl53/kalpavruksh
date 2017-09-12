@@ -2,61 +2,50 @@ from django.shortcuts import render
 
 # Create your views here.
 
-from quiz.models import User
+from quiz.models import User,Question,Answer,Tenant
 from django.http import Http404
 
-from quiz.serializers import UserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import F,Case,When,CharField,Sum, Value as V
+import copy
+import json
+from rest_framework import generics,renderers
 
-class UserList(APIView):
+
+class QuesList(APIView):
     """
-    List all users, or create a new user.
+    List all question and their answer.
     """
     def get(self, request, format=None):
-	print "get called>>>"
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+	ques = list(Question.objects.filter(private = 0).\
+	annotate(ans=F('answer__body'),answer_username=F('answer__user__name'), question_username=F('user__name')).\
+		values('Title','id','ans','question_username','answer_username'))
+	print ques
+	qids = list(set([ids['id'] for ids in ques ]))
+	
+	response_data = []
+	for qid in qids:
+		per_q = [q for q in ques if q['id'] == qid]
+		data = {}
+		copy_q = copy.deepcopy(per_q)
+		for x in copy_q:
+			data.update({'Title':x.pop('Title',None)})
+			data.update({'id':x.pop('id',None)})
+			data.update({'question_username':x.pop('question_username',None)})
+		data.update({'answers':copy_q})
+		response_data.append(data)
+        return Response(json.dumps(response_data))
 
-    def post(self, request, format=None):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class Dashboard(generics.RetrieveAPIView):
+	renderer_classes = (renderers.TemplateHTMLRenderer,)
 
-    def delete(self, request, pk, format=None):
-        user = self.get_object(pk)
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class UserDetail(APIView):
-    """
-    Retrieve, update or delete a user instance.
-    """
-    def get_object(self, pk):
-        try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        user = self.get_object(pk)
-        user = UserSerializer(user)
-        return Response(user.data)
-
-    def put(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.DATA)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        user = self.get_object(pk)
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+	def get(self,request):
+		number_of_user = User.objects.count()
+		number_of_question = Question.objects.count()
+		number_of_answer = Answer.objects.count()
+		number_of_request = list(Tenant.objects.all().values('api_key','api_request_count'))
+		print "number_of_request>>>",number_of_request
+		print "number_of_user>>",number_of_user,">>number_of_question>>",number_of_question,">>number_of_answer>>",number_of_answer
+		return Response({'number_of_user': 3}, template_name='dashboard.html')
