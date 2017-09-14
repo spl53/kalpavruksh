@@ -19,10 +19,10 @@ class QuesList(APIView):
     List all question and their answer.
     """
     def get(self, request, format=None):
-	ques = list(Question.objects.filter(private = 0).\
+	query = request.GET.get('query',"")
+	ques = list(Question.objects.filter(private = 0,Title__icontains = query).\
 	annotate(ans=F('answer__body'),answer_username=F('answer__user__name'), question_username=F('user__name')).\
 		values('Title','id','ans','question_username','answer_username'))
-	print ques
 	qids = list(set([ids['id'] for ids in ques ]))
 	
 	response_data = []
@@ -36,6 +36,7 @@ class QuesList(APIView):
 			data.update({'question_username':x.pop('question_username',None)})
 		data.update({'answers':copy_q})
 		response_data.append(data)
+	print "RESPONSE DATA>>",response_data
         return Response(json.dumps(response_data))
 
 class Dashboard(generics.RetrieveAPIView):
@@ -48,4 +49,4 @@ class Dashboard(generics.RetrieveAPIView):
 		number_of_request = list(Tenant.objects.all().values('api_key','api_request_count'))
 		print "number_of_request>>>",number_of_request
 		print "number_of_user>>",number_of_user,">>number_of_question>>",number_of_question,">>number_of_answer>>",number_of_answer
-		return Response({'number_of_user': 3}, template_name='dashboard.html')
+		return Response({'number_of_user': number_of_user, 'number_of_request':number_of_request, 'number_of_question':number_of_question,'number_of_answer':number_of_answer}, template_name='dashboard.html')

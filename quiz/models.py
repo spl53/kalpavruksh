@@ -39,10 +39,9 @@ class Tenant(models.Model):
 		db_table = 'Tenant'
 	
 class ApiRequestCount(models.Model):
-	date = models.DateField(primary_key=True)
+	date = models.DateTimeField()
 	tenant = models.ForeignKey(Tenant)
-	api_request_count = models.IntegerField()
-	last_requested_on = models.DateTimeField()
+	api_request = models.CharField(max_length=100)
 	
 	class Meta:
 		"""This is the table name in Database."""
