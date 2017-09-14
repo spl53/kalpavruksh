@@ -47,6 +47,4 @@ class Dashboard(generics.RetrieveAPIView):
 		number_of_question = Question.objects.count()
 		number_of_answer = Answer.objects.count()
 		number_of_request = list(Tenant.objects.all().values('api_key','api_request_count'))
-		print "number_of_request>>>",number_of_request
-		print "number_of_user>>",number_of_user,">>number_of_question>>",number_of_question,">>number_of_answer>>",number_of_answer
 		return Response({'number_of_user': number_of_user, 'number_of_request':number_of_request, 'number_of_question':number_of_question,'number_of_answer':number_of_answer}, template_name='dashboard.html')

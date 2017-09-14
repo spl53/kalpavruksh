@@ -21,24 +21,30 @@ class APIKeyAuthentication(authentication.BaseAuthentication):
         return (tenant, None)
 
 
-class RandomRateThrottle(throttling.BaseThrottle):
+class Throttle_rate(throttling.BaseThrottle):
     def allow_request(self, request, view):
 	url = request.get_full_path()
 	current_time = datetime.utcnow()
 	start_time = current_time.date()
 	end_time = start_time + timedelta(days = 1)
 	total_request = ApiRequestCount.objects.filter(date__gte = start_time,date__lt = end_time).order_by('-date')
-	if total_request.count() <= 100:
+	if total_request.count() <= 3:
 	        api_key = request.GET.get('api_key')
-        	tenant = Tenant.objects.get(api_key = api_key)
-		ApiRequestCount.objects.create(date = current_time, api_request = url, tenant = tenant)
-        	return True
+		try:
+	        	tenant = Tenant.objects.get(api_key = api_key)
+			ApiRequestCount.objects.create(date = current_time, api_request = url, tenant = tenant)
+        		return True
+		except Exception as e:
+			return False
 	else:
 		elapsed_time = (current_time - total_request[0].date.replace(tzinfo=None)).seconds
 		if elapsed_time < 10:
 			return False
 		else:
 			api_key = request.GET.get('api_key')
-			tenant = Tenant.objects.get(api_key = api_key)
-			ApiRequestCount.objects.create(date = current_time, api_request = url, tenant = tenant)
-			return True
+			try:
+				tenant = Tenant.objects.get(api_key = api_key)
+				ApiRequestCount.objects.create(date = current_time, api_request = url, tenant = tenant)
+				return True
+			except Exception as e:
+				return False

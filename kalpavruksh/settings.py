@@ -54,14 +54,12 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'quiz.authentication.APIKeyAuthentication',
-    )
-}
-
-REST_FRAMEWORK = {
-'DEFAULT_THROTTLE_CLASSES': (
-        'quiz.authentication.RandomRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'quiz.authentication.Throttle_rate',
     ),
 }
+
 ROOT_URLCONF = 'kalpavruksh.urls'
 
 # List of callables that know how to import templates from various sources.

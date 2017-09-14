@@ -1,18 +1,40 @@
 <html>
-<link href="/static/css/bootstrap-theme.min.css" rel="stylesheet"></link>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet"></link>
 
 <body>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <div class="row">
-            <div class="col-xs-3">
-                <i class="fa fa-comments fa-5x"></i>
+            <div class="col-xs-4 text-center">
+                <div>Total number of Users</div>
+                <div class="huge">{{number_of_user}}</div>
             </div>
-            <div class="col-xs-9 text-right">
-                <div class="huge">{{cfp_answer}}</div>
-                <div>CFP Answered</div>
+	    <div class="col-xs-4 text-center">
+                <div>Total number of Questions</div>
+                <div class="huge">{{number_of_question}}</div>
+            </div>
+	    <div class="col-xs-4 text-center">
+                <div>Total number of Answer</div>
+                <div class="huge">{{number_of_answer}}</div>
             </div>
         </div>
+    </div>
+</div>
+<div class="col-lg-6">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"> Tanent Api with request count</h3>
+    </div>
+    <div class="panel-body">
+        <div class="list-group">
+	    {% for each in number_of_request %}
+            <div class="list-group-item">
+                <span class="badge">{{each.api_request_count}}</span>
+                <i class="fa fa-fw"></i> {{each.api_key}}
+            </div>
+	    {% endfor %}
+          </div>
     </div>
 </div>
 </body>
